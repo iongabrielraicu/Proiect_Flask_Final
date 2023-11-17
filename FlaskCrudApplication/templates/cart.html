@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{{ product_info.nume }} - Cart</title>
+    <!-- Include any necessary styles or scripts here -->
+
+    <link href="{{url_for('static', filename='css/custom.css')}}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="cart-container">
+        <h1>My Cart</h1>
+        <h3>{{ product_info.nume }}</h3>
+
+        <div>
+            <img src="{{ url_for('show_image', product_id=product_info.id) }}" alt="{{ product_info.nume }}" style="max-width: 200px; max-height: 200px;">
+        </div>
+
+        <p>Quantity: <button onclick="decreaseQuantity()">-</button> <span id="quantity">1</span> <button onclick="increaseQuantity()">+</button></p>
+        <h1 id="price">{{ product_info.pret }} - Pret</h1>
+
+        <div class="cart-actions">
+            <form action="{{ url_for('afisare_payment', pret=product_info.pret) }}" method="post">
+                <input class="cart-submit" type="submit" value="Buy">
+            </form>
+            <form action="{{ url_for('remove_from_cart', product_id=product_info.id) }}" method="post">
+                <input class="cart-remove" type="submit" value="Remove from Cart">
+            </form>
+            <a class="back-to-shopping" href="{{ url_for('index') }}">Back to Shopping</a>
+        </div>
+
+    </div>
+    <!-- Include any additional content as needed -->
+
+    <script>
+        var basePrice = {{ product_info.pret }}; // Store the base price
+        var quantityElement = document.getElementById('quantity');
+        var priceElement = document.getElementById('price');
+
+        function increaseQuantity() {
+            var currentQuantity = parseInt(quantityElement.innerText);
+            quantityElement.innerText = currentQuantity + 1;
+
+            // Update the price dynamically
+            var newPrice = basePrice * (currentQuantity + 1);
+            priceElement.innerText = newPrice.toFixed(2) + ' - Pret'; // Format to two decimal places
+        }
+
+        function decreaseQuantity() {
+            var currentQuantity = parseInt(quantityElement.innerText);
+            var newQuantity = currentQuantity - 1 <= 1 ? 1 : currentQuantity - 1;
+            quantityElement.innerText = newQuantity;
+
+            // Update the price dynamically
+            var newPrice = basePrice * newQuantity;
+            priceElement.innerText = newPrice.toFixed(2) + ' - Pret'; // Format to two decimal places
+        }
+    </script>
+
+</body>
+
+</html>

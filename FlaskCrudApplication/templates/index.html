@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Doar Dinamo București</title>
+    <link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+    <link rel="shortcut icon" href="{{url_for('static', filename='dinamo.png')}}">
+    <link href="{{url_for('static', filename='css/custom.css')}}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+    <!-- Inline styling for the well div -->
+    <style>
+        .well {
+            background-color: red;
+            color: black;
+            padding: 20px; /* Adjust the padding as needed for spacing */
+        </style>
+    </head>
+
+<body>
+
+    <div class="container">
+        <div class="well text-center">
+            <div class="app-title-container">
+                <h1 class="app-title">FAN Shop Dinamo București</h1>
+            </div>
+            <a href="{{ url_for('logout') }}" class="log-out pull-right">Log Out</a>
+        </div>
+
+        {% block body %}
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col md-12 page-container">
+                    <h2 class="table-header">Produse Dinamo
+                        <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#addImage">Adaugare imagine produs</button>
+                        <button type="button" class="btn btn-success pull-right mr-2" data-toggle="modal" data-target="#myModal">Adaugare produse</button>
+                    </h2>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{message}}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Nume</th>
+                                <th>Cantitate</th>
+                                <th>Pret</th>
+                                <th>Optiune</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in products %}
+                            <tr>
+                                <td>{{ row.0 }}</td>
+                                <td>{{ row.1 }}</td>
+                                <td>{{ row.2 }}</td>
+                                <td>{{ row.3 }}</td>
+                                <td>
+                                    <a href="{{ url_for('cart', product_id=row[0]) }}" class="btn btn-success btn-xs" target="_blank">Buy</a>
+                                    <a href="/update/{{ row.0 }}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{ row.0 }}">Edit</a>
+                                    <a href="/delete/{{ row.0 }}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')">Delete</a>
+                                    <a href="{{ url_for('show_image', product_id=row[0]) }}">Show Image</a>
+                                </td>
+                            </tr>
+                            <div id="modaledit{{ row.0 }}" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Update Information</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{ url_for('update') }}" method="POST">
+                                                <div class="form-group">
+                                                    <label>Id:</label>
+                                                    <input type="text" class="form-control" name="id" value="{{ row.0 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Nume:</label>
+                                                    <input type="text" class="form-control" name="nume" value="{{ row.1 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Cantitate:</label>
+                                                    <input type="text" class="form-control" name="cantitate" value="{{ row.2 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Pret:</label>
+                                                    <input type="text" class="form-control" name="pret" value="{{ row.3 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <button class="btn btn-primary" type="submit">Update</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Please Insert Data</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('insert') }}" method="POST">
+                                <div class="form-group">
+                                    <label>Nume:</label>
+                                    <input type="text" class="form-control" name="nume" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantitate: (min: 1 - max: 999)</label>
+                                    <input type="number" min="1" max="999" class="form-control" name="cantitate" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pret:</label>
+                                    <input type="number" class="form-control" name="pret" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Insert Data</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="addImage" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Please Insert Product Image</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label>Id produs:</label>
+                                    <input type="number" min="1" max="9999999" name="product_id"> <!-- Replace '123' with the actual product ID -->
+                                </div>
+                                <!-- Your other form fields -->
+                                <input type="file" name="image">
+                                <input class="add-image pull-right" type="submit" value="Upload">
+                            </form>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endblock %}
+    <div class="container footer-image">
+        <img src="{{url_for('static', filename='uploads/footer-image.jpg')}}" alt="Description of your image">
+    </div>
+
+    </div>
+        <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.1.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+</body>
+</html>
